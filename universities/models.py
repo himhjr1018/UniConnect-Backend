@@ -18,7 +18,7 @@ class Program(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return self.university.name + ":" + self.name
 
 
 class Intake(models.Model):
@@ -26,5 +26,5 @@ class Intake(models.Model):
     intake_name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.prgram.university.name + self.program.name + self.intake_name
+        return self.program.university.name + ": " +self.program.name + ": " + self.intake_name
 
