@@ -1,7 +1,8 @@
 from django.urls import path
 from users.views import LoginView, LogoutView, SignUpView, AddEducation, AddExperience, InterestedProgramCreateAPIView,\
     EducationUpdateAPIView, ExperienceUpdateAPIView, InterestedProgramUpdateAPIView, EducationDeleteAPIView, ExperienceDeleteAPIView,\
-    InterestedProgramDeleteAPIView, ProfilePictureUploadAPIView, EditIntroAPIView, UsernameUpdateAPIView, UserDeleteAPIView, UserProfileDetailAPIView
+    InterestedProgramDeleteAPIView, ProfilePictureUploadAPIView, EditIntroAPIView, UsernameUpdateAPIView, UserDeleteAPIView, UserProfileDetailAPIView,\
+    OUserProfileDetailAPIView, UserProfileListAPIView
 
 urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
@@ -21,5 +22,6 @@ urlpatterns = [
     path('update_username/', UsernameUpdateAPIView.as_view(), name='update_username'),
     path('remove_user/', UserDeleteAPIView.as_view(), name='remove_user'),
     path('profile/', UserProfileDetailAPIView.as_view(), name='profile_detail'),
-
+    path('profile/<int:id>/', OUserProfileDetailAPIView.as_view(), name='oprofile_detail'),
+    path('profile_list/', UserProfileListAPIView.as_view(), name="profile_list")
 ]

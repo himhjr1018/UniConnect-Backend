@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'universities',
+    'microsoft_graph',
     'drf_yasg',
     'django_filters'
 ]

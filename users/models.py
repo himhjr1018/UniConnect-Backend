@@ -15,6 +15,10 @@ class UserProfile(User):
     country = models.CharField(max_length=100, null=True, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pictures', null=True, blank=True)
     phone_number = models.CharField(max_length=16, null=True, blank=True)
+    con_connected = models.BooleanField(default=False)
+    con_access_token = models.TextField(null=True, blank=True)
+    con_access_expiry = models.DateTimeField(null=True, blank=True)
+    con_refresh_token = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.username + ":" + self.email

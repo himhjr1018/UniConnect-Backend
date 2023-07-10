@@ -1,0 +1,7 @@
+clientId="5e5e47e2-536b-4328-b7d9-1a78384551b5"
+clientSecret="mZA8Q~Ubc4x4uhlv87wj2CfB5My8t5rVEY5d~byK"
+tenantId="7399911d-6bb3-4d09-80bd-35e6bf1f1fdf"
+authTenant="common"
+graphUserScopes="contacts.read user.read"
+redirectUri="http%3A%2F%2Flocalhost:8000%2Fms_graph%2Fgraph_redirect_uri"
+accessRedirectUri="http://localhost:8000/ms_graph/graph_redirect_uri"

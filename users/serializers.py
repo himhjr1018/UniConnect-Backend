@@ -92,21 +92,23 @@ class UpdateUserNameSerializer(serializers.ModelSerializer):
             self.fields = {field: self.fields[field] for field in allowed_fields}
 
 
-
 class EducationDSerializer(serializers.ModelSerializer):
     class Meta:
         model = Education
         fields = ['id', 'degree', 'institution', 'city', 'state', 'country', 'start_date', 'end_date', 'field_of_study']
+
 
 class ExperienceDSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experience
         fields = ['id', 'title', 'company', 'city', 'state', 'country', 'start_date', 'end_date', 'description']
 
+
 class InterestedProgramDSerializer(serializers.ModelSerializer):
     class Meta:
         model = InterestedProgram
         fields = ['id', 'intake', 'stage']
+
 
 class UserProfileDetailSerializer(serializers.ModelSerializer):
     educations = serializers.SerializerMethodField()
@@ -116,7 +118,7 @@ class UserProfileDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'phone_number', 'city', 'state', 'country',
-                  'profile_picture', 'educations', 'experiences', 'interested_programs']
+                  'profile_picture', 'educations', 'experiences', 'interested_programs', 'con_connected']
 
     def get_educations(self, obj):
         educations = Education.objects.filter(profile=obj)

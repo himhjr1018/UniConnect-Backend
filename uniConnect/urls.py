@@ -28,7 +28,8 @@ from drf_yasg.generators import OpenAPISchemaGenerator
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('universities/', include('universities.urls')),
-    path('user/', include('users.urls'))
+    path('user/', include('users.urls')),
+    path('ms_graph/', include('microsoft_graph.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 schema_view = get_schema_view(

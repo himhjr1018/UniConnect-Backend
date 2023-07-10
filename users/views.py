@@ -11,12 +11,18 @@ from users.serializers import LoginSerializer, SignupSerializer, AddEducationSer
     AddInterestedProgramSerializer, EducationSerializer, ExperienceSerializer, InterestedProgramSerializer, \
     UploadProfilePicSerializer, EditIntroSerializer, UpdateUserNameSerializer, UserProfileDetailSerializer
 from rest_framework import status, generics, permissions
-from drf_yasg.utils import swagger_auto_schema
 import random
 import string
 from rest_framework.permissions import IsAuthenticated
 from users.models import UserProfile
 from rest_framework.parsers import MultiPartParser
+from django.http import Http404
+from django.db.models import Q
+import requests
+from django.utils import timezone
+from microsoft_graph.utils import graph_call, refresh_access_token, OUTLOOK_CONTACTS_API
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 
 class LoginView(APIView):
@@ -76,15 +82,20 @@ def generate_username(first_name):
 class SignUpView(APIView):
     @swagger_auto_schema(request_body=SignupSerializer)
     def post(self, request):
-        serializer = SignupSerializer(data=request.data)
-        if serializer.is_valid():
-            user_profile = UserProfile(**serializer.validated_data)
-            user_profile.username = generate_username(user_profile.first_name)
-            user_profile.set_password(serializer.validated_data['password'])
-            user_profile.save()
-            return Response(status=status.HTTP_201_CREATED)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+
+            serializer = SignupSerializer(data=request.data)
+            if serializer.is_valid():
+                user_profile = UserProfile(**serializer.validated_data)
+                user_profile.username = generate_username(user_profile.first_name)
+                user_profile.set_password(serializer.validated_data['password'])
+                user_profile.save()
+                return Response(status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)
+            raise e
 
 
 class AddEducation(APIView):
@@ -266,16 +277,74 @@ class UserProfileDetailAPIView(generics.RetrieveAPIView):
         return self.request.user.userprofile
 
 
-# class UserList(APIView):
-#
-#     def post(self, request):
-#         # This api is to provide the list of matched students based on profile
-#         # It should also provide the filters
-#         pass
-#
-#
-# class SyncContacts(APIView):
-#
-#     def post(self, request):
-#         # This api is to sync contacts from outlook
-#         pass
+class OUserProfileDetailAPIView(generics.RetrieveAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        profile_id = self.kwargs["id"]  # Assuming the URL parameter is named "profile_id"
+        try:
+            return UserProfile.objects.get(id=profile_id)
+        except UserProfile.DoesNotExist:
+            raise Http404("Profile Not Found")
+
+
+def get_filter_by_contacts(queryset, profile):
+    if not profile.con_connected:
+        return queryset
+
+    refresh_access_token(profile)
+    resp = graph_call(OUTLOOK_CONTACTS_API, profile.con_access_token, method="GET")
+    resp = resp.json()
+    value = resp['value']
+    mobile_numbers = []
+    for i in value:
+        if i["mobilePhone"]:
+            mobile_numbers.append(i["mobilePhone"])
+    return queryset.filter(phone_number__in=mobile_numbers)
+
+
+class UserProfileListAPIView(generics.ListAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('filter_by_contacts', openapi.IN_QUERY, description='Filter by contacts',
+                              type=openapi.TYPE_BOOLEAN),
+            openapi.Parameter('filter_by_ip', openapi.IN_QUERY, description='Filter by IP', type=openapi.TYPE_BOOLEAN),
+            openapi.Parameter('search', openapi.IN_QUERY, description='Search query', type=openapi.TYPE_STRING),
+        ]
+    )
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        search_query = self.request.query_params.get('search', None)
+        if search_query:
+            queryset = queryset.filter(
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query) |
+                Q(username__icontains=search_query) |
+                Q(email__icontains=search_query) |
+                Q(education__institution__icontains=search_query) |
+                Q(experience__company__icontains=search_query)
+            )
+
+        filter_by_contacts = self.request.query_params.get('filter_by_contacts', None)
+        filter_by_ip = self.request.query_params.get('filter_by_ip', None)
+        profile = UserProfile.objects.get(id=self.request.user.id)
+
+        if filter_by_contacts == "true":
+            queryset = get_filter_by_contacts(queryset, profile)
+
+        if filter_by_ip == "true":
+            interested_programs = profile.interestedprogram_set.all()
+            intakes = interested_programs.values_list('intake', flat=True).distinct()
+            queryset = queryset.filter(interestedprogram__intake__in=intakes)
+        queryset = queryset.exclude(id=profile.id).distinct()
+        print(queryset.count())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
