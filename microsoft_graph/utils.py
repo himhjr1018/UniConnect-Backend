@@ -1,8 +1,3 @@
-from django.core.management.base import BaseCommand
-
-from time import sleep
-from django.core import management
-from users.models import UserProfile
 import requests
 from . import config
 from datetime import datetime, timedelta

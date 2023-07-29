@@ -74,6 +74,4 @@ class InterestedProgram(models.Model):
     intake = models.ForeignKey(Intake, on_delete=models.CASCADE)
     stage = models.CharField(max_length=20, choices=STAGE_CHOICES)
 
-    def __str__(self):
-        return f'{self.user.username}  {self.program.name}'
 

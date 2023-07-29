@@ -25,12 +25,11 @@ SECRET_KEY = 'django-insecure-l61m^=b$(h=7@3cakvkdy8r7&k+j1c-0ozhpf*v8c3&z6kx=nu
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,13 +40,18 @@ INSTALLED_APPS = [
     'users',
     'universities',
     'microsoft_graph',
+    'chatroom',
     'drf_yasg',
-    'django_filters'
+    'django_filters',
+	'corsheaders',
+    'channels',
+
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -75,6 +79,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'uniConnect.wsgi.application'
 
+ASGI_APPLICATION = "uniConnect.asgi.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+        }
+    }
+
+ALLOWED_HOSTS=['*']
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
