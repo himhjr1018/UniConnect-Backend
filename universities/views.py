@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-
+from rest_framework.response import Response
 # Create your views here.
 from rest_framework import generics, permissions
 from rest_framework import filters
@@ -41,4 +41,10 @@ class IntakeListAPIView(generics.ListAPIView):
         program_id = self.kwargs['program_id']
         queryset = Intake.objects.filter(program_id=program_id)
         return queryset
+
+
+class CountryListView(APIView):
+    def get(self, request, format=None):
+        countries = University.objects.order_by('country').values_list('country', flat=True).distinct()
+        return Response({'countries': countries})
 

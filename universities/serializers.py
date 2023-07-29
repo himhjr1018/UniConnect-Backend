@@ -20,5 +20,3 @@ class IntakeSerializer(serializers.ModelSerializer):
         model = Intake
         fields = ['id', 'intake_name']
 
-
-
