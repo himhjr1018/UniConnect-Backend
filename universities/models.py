@@ -5,9 +5,10 @@ from django.db import models
 
 class University(models.Model):
     name = models.CharField(max_length=100)
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    country = models.CharField(max_length=100)
+    city = models.CharField(max_length=100, null=True, blank=True)
+    state = models.CharField(max_length=100, null=True, blank=True)
+    country = models.CharField(max_length=100, null=True, blank=True)
+    domain = models.URLField(max_length=500, null=True, blank=True)
 
     def __str__(self):
         return self.name
