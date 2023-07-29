@@ -46,5 +46,6 @@ class IntakeListAPIView(generics.ListAPIView):
 class CountryListView(APIView):
     def get(self, request, format=None):
         countries = University.objects.order_by('country').values_list('country', flat=True).distinct()
-        return Response({'countries': countries})
+        clist = [{'value': country, 'label':country} for country in countries]
+        return Response(clist)
 
