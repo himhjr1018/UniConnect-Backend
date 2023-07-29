@@ -20,3 +20,8 @@ class IntakeSerializer(serializers.ModelSerializer):
         model = Intake
         fields = ['id', 'intake_name']
 
+
+class UniversityAddSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = University
+        fields = '__all__'

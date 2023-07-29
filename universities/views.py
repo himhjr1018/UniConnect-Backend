@@ -3,10 +3,10 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.views import APIView
 from rest_framework.response import Response
 # Create your views here.
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
 from rest_framework import filters
 from .models import University, Program, Intake
-from .serializers import UniversityListSerializer, ProgramSerializer, IntakeSerializer
+from .serializers import UniversityListSerializer, ProgramSerializer, IntakeSerializer, UniversityAddSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg import openapi
 
@@ -79,4 +79,17 @@ class UniversityListView(APIView):
         universities = universities.values_list('id', 'name')
         uni_list = [{'value': id, 'label': name} for id, name in universities]
         return Response(uni_list)
+
+
+class UniversityCreateView(APIView):
+
+    @swagger_auto_schema(request_body=UniversityAddSerializer)
+    def post(self, request, format=None):
+        serializer = UniversityAddSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
