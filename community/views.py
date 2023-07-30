@@ -81,7 +81,7 @@ class CommentAPIView(APIView):
             post = Post.objects.get(id=post_id)
         except Post.DoesNotExist:
             return Response({'error': "Post Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = CommentSerializer(post.comments.all(), many=True)
+        serializer = CommentSerializer(post.comments.all().order_by("-ctime"), many=True)
         return Response(serializer.data)
 
     @swagger_auto_schema(request_body=AddCommentSerializer)

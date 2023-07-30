@@ -15,15 +15,21 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     posted_by = ProfileSerializer()
+    ctime = serializers.SerializerMethodField()
     class Meta:
         model = Comment
         fields = ["id", "content", 'posted_by', "ctime"]
+    def get_ctime(self, comment):
+        formatted_date = comment.ctime.strftime('%d %B %Y')
+        formatted_time = comment.ctime.strftime('%I:%M %p')
+        return {'date': formatted_date, 'time': formatted_time}
 
 class PostSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
     comments_count = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
     posted_by = ProfileSerializer()
+    ctime = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -42,6 +48,10 @@ class PostSerializer(serializers.ModelSerializer):
             return True
         return False
 
+    def get_ctime(self, post):
+        formatted_date = post.ctime.strftime('%d %B %Y')
+        formatted_time = post.ctime.strftime('%I:%M %p')
+        return {'date': formatted_date, 'time': formatted_time}
 
 class CommunitySerializer(serializers.ModelSerializer):
     university_id = serializers.IntegerField(source='id')
@@ -64,7 +74,7 @@ class CommunitySerializer(serializers.ModelSerializer):
         context = self.context
         request =  self.context['request']
         tags = request.query_params.getlist('tag', [])
-        posts = instance.posts.all()
+        posts = instance.posts.all().order_by('-ctime')
 
         if tags:
             or_condition = Q()
