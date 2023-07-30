@@ -3,6 +3,8 @@ from rest_framework import serializers
 from universities.models import University
 from users.models import InterestedProgram, UserProfile
 from .models import Post
+from rest_framework import pagination, serializers
+from .pagination import CustomPostPagination
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -55,9 +57,20 @@ class CommunitySerializer(serializers.ModelSerializer):
         # Pass the context to the related ProgramSerializer
         context = self.context
         posts = instance.posts.all()
-        program_serializer = PostSerializer(posts, many=True, context=context)
+        paginator = CustomPostPagination()
+        page = paginator.paginate_queryset(posts, self.context['request'])
+        posts_serializer = PostSerializer(page, many=True, context=context)
+
+        pagination_info = {
+            'page_number': paginator.page.number,
+            'next_page': paginator.get_next_link(),
+            'previous_page': paginator.get_previous_link(),
+            'total_pages': paginator.page.paginator.num_pages,
+        }
 
         # Create the representation for the UniversitySerializer
         representation = super().to_representation(instance)
-        representation['posts'] = program_serializer.data
+        representation['posts'] = posts_serializer.data
+        representation['pagination'] = pagination_info  # Include pagination info in the response
+
         return representation
