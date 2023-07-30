@@ -27,6 +27,6 @@ urlpatterns = [
     path('profile/', UserProfileDetailAPIView.as_view(), name='profile_detail'),
     path('profile/<int:id>/', OUserProfileDetailAPIView.as_view(), name='oprofile_detail'),
     path('profile_list/', UserProfileListAPIView.as_view(), name="profile_list"),
-    path('intrested_programs/', InterestedProgramAPIView.as_view(), name="ip_list"),
+    path('favourites/', InterestedProgramAPIView.as_view(), name="ip_list"),
     path('add_favourite/', InterestedProgramView.as_view(), name="add_favourite")
 ]
