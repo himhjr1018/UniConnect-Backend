@@ -21,7 +21,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['content', 'ctime', 'likes_count', 'comments_count', 'posted_by', 'is_liked']
+        fields = ['content', 'ctime', 'likes_count', 'comments_count', 'posted_by', 'tags', 'is_liked']
 
     def get_likes_count(self, post):
         return post.liked_by.count()
@@ -56,7 +56,11 @@ class CommunitySerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         # Pass the context to the related ProgramSerializer
         context = self.context
+        request =  self.context['request']
+        tag = request.GET.get("tag", None)
         posts = instance.posts.all()
+        if tag:
+            posts = posts.filter(tags__contains=tag)
         paginator = CustomPostPagination()
         page = paginator.paginate_queryset(posts, self.context['request'])
         posts_serializer = PostSerializer(page, many=True, context=context)
@@ -74,3 +78,10 @@ class CommunitySerializer(serializers.ModelSerializer):
         representation['pagination'] = pagination_info  # Include pagination info in the response
 
         return representation
+
+
+class AddPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['content', 'tags']
+
