@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import serializers
 
 from universities.models import University
@@ -57,10 +58,15 @@ class CommunitySerializer(serializers.ModelSerializer):
         # Pass the context to the related ProgramSerializer
         context = self.context
         request =  self.context['request']
-        tag = request.GET.get("tag", None)
+        tags = request.query_params.getlist('tag', [])
         posts = instance.posts.all()
-        if tag:
-            posts = posts.filter(tags__contains=tag)
+
+        if tags:
+            or_condition = Q()
+            for tag in tags:
+                or_condition |= Q(tags__contains=tag)
+            posts = posts.filter(or_condition)
+
         paginator = CustomPostPagination()
         page = paginator.paginate_queryset(posts, self.context['request'])
         posts_serializer = PostSerializer(page, many=True, context=context)

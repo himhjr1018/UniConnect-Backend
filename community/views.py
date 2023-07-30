@@ -20,7 +20,7 @@ class Community(APIView):
         manual_parameters=[
             openapi.Parameter('page', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Page number'),
             openapi.Parameter('page_size', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Items per page'),
-            openapi.Parameter('tag', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Tag to filter posts')
+            openapi.Parameter('tag', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Tag to filter posts', explode=True)
         ]
     )
     def get(self, request, university_id):
@@ -51,3 +51,4 @@ class Community(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
