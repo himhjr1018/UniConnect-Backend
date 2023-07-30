@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from users.models import UserProfile, Education, Experience, InterestedProgram
+from users.models import UserProfile, Education, Experience, InterestedProgram, STAGE_CHOICES
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.validators import UniqueValidator
 
@@ -134,3 +134,9 @@ class UserProfileDetailSerializer(serializers.ModelSerializer):
         ips = InterestedProgram.objects.filter(profile=obj)
         serializer = InterestedProgramDSerializer(ips, many=True)
         return serializer.data
+
+
+class AddFavSerializer(serializers.Serializer):
+    program_id = serializers.IntegerField()
+    intake_name = serializers.CharField()
+    stage = serializers.ChoiceField(default="Interested", choices=STAGE_CHOICES)

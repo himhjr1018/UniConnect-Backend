@@ -57,21 +57,24 @@ class Experience(models.Model):
     def __str__(self):
         return self.company + ":" + self.title
 
+INTERESTED = 'Interested'
+APPLIED = 'Applied'
+ADMITTED = 'Admitted'
+JOINED = 'Joined'
 
-class InterestedProgram(models.Model):
-    INTERESTED = 'Interested'
-    APPLIED = 'Applied'
-    ADMITTED = 'Admitted'
-    JOINED = 'Joined'
-    STAGE_CHOICES = [
+
+STAGE_CHOICES = [
         (INTERESTED, 'Interested'),
         (APPLIED, 'Applied'),
         (ADMITTED, 'Admitted'),
         (JOINED, 'Joined'),
     ]
 
+
+class InterestedProgram(models.Model):
+
     profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     intake = models.ForeignKey(Intake, on_delete=models.CASCADE)
-    stage = models.CharField(max_length=20, choices=STAGE_CHOICES)
+    stage = models.CharField(max_length=20,default='Interested', choices=STAGE_CHOICES)
 
 

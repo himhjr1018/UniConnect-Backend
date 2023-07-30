@@ -4,12 +4,14 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
 
+from universities.models import Intake, Program
 from users.models import CustomToken, Education, Experience, InterestedProgram
 from django.contrib.auth.models import User
 
 from users.serializers import LoginSerializer, SignupSerializer, AddEducationSerializer, AddExperienceSerializer, \
     AddInterestedProgramSerializer, EducationSerializer, ExperienceSerializer, InterestedProgramSerializer, \
-    UploadProfilePicSerializer, EditIntroSerializer, UpdateUserNameSerializer, UserProfileDetailSerializer
+    UploadProfilePicSerializer, EditIntroSerializer, UpdateUserNameSerializer, UserProfileDetailSerializer, \
+    AddFavSerializer
 from rest_framework import status, generics, permissions
 import random
 import string
@@ -347,4 +349,69 @@ class UserProfileListAPIView(generics.ListAPIView):
         print(queryset.count())
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class InterestedProgramAPIView(APIView):
+    def get(self, request, format=None):
+        user = request.user  # Assuming the user is authenticated and you are using sessions
+
+        interested_programs = InterestedProgram.objects.filter(profile__id=user.id)
+        universities_data = []
+
+        for interested_program in interested_programs:
+            uni = interested_program.intake.program.university
+            program = interested_program.intake.program
+
+            # Check if the university is already in the universities_data list
+            uni_data = next((item for item in universities_data if item['id'] == uni.id), None)
+
+            if not uni_data:
+                # Create a new university entry in the universities_data list
+                uni_data = {
+                    'name': uni.name,
+                    'id': uni.id,
+                    'programs': [],
+                }
+                universities_data.append(uni_data)
+
+            # Check if the program is already in the programs list of the university entry
+            program_data = next((item for item in uni_data['programs'] if item['name'] == program.name), None)
+
+            if not program_data:
+                # Create a new program entry in the programs list of the university entry
+                program_data = {
+                    'name': program.name,
+                    'id': program.id,
+                    'intakes': [],
+                }
+                uni_data['programs'].append(program_data)
+
+            # Add the intake to the intakes list of the program entry
+            program_data['intakes'].append({'id': interested_program.intake.id, 'name': interested_program.intake.intake_name, \
+                                            'stage': interested_program.stage})
+
+        return Response(universities_data)
+
+
+class InterestedProgramView(APIView):
+
+    @swagger_auto_schema(request_body=AddFavSerializer)
+    def post(self, request):
+        data = request.data
+
+        try:
+            program = Program.objects.get(id=data["program_id"])
+        except Program.DoesNotExist:
+            return Response({"error": "Given Profile Doesnot Exists"}, status=status.HTTP_404_NOT_FOUND)
+
+        stage = data.get("stage", "Interested")
+
+        intake, created = Intake.objects.get_or_create(intake_name=data["intake_name"], program=program)
+        profile = UserProfile.objects.get(id=request.user.id)
+        ip, created = InterestedProgram.objects.get_or_create(profile=profile, intake=intake)
+        if not created:
+            return Response({"error": "This program is already is in your favourites"})
+        ip.stage = stage
+        ip.save()
+        return Response(status=status.HTTP_200_OK)
 

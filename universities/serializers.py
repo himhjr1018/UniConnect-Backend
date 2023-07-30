@@ -31,3 +31,25 @@ class ProgramAddSerializer(serializers.ModelSerializer):
     class Meta:
         model = Program
         fields = '__all__'
+
+
+class IPIntakeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Intake
+        fields = ['intake_name']
+
+
+class IPProgramSerializer(serializers.ModelSerializer):
+    intakes = IPIntakeSerializer(many=True)
+
+    class Meta:
+        model = Program
+        fields = ['program_name', 'intakes']
+
+
+class IPUniversitySerializer(serializers.ModelSerializer):
+    programs = IPProgramSerializer(many=True, source='program_set')
+
+    class Meta:
+        model = University
+        fields = ['uni_name', 'id', 'programs']
