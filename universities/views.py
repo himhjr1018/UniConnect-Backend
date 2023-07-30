@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from rest_framework import generics, permissions, status
 from rest_framework import filters
 from .models import University, Program, Intake
-from .serializers import UniversityListSerializer, ProgramSerializer, IntakeSerializer, UniversityAddSerializer
+from .serializers import UniversityListSerializer, ProgramSerializer, IntakeSerializer, UniversityAddSerializer, \
+    ProgramAddSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg import openapi
 
@@ -82,14 +83,46 @@ class UniversityListView(APIView):
 
 
 class UniversityCreateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(request_body=UniversityAddSerializer)
     def post(self, request, format=None):
         serializer = UniversityAddSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            uni = serializer.save()
+            return Response({'value': uni.id, 'label': uni.name}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class ProgramCreateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(request_body=ProgramSerializer)
+    def post(self, request, university_id, format=None):
+        try:
+            university = University.objects.get(pk=university_id)
+        except University.DoesNotExist:
+            return Response({"error": "University not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        data = request.data.copy()
+        data["university"] = university_id
+        serializer = ProgramAddSerializer(data=data)
+
+        if serializer.is_valid():
+            program = serializer.save()
+            return Response({'value': program.id, 'label': program.name}, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProgramListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, university_id, format=None):
+        programs = Program.objects.filter(university__id=university_id).values_list('id', 'name')
+        program_list = [{'value': id, 'label': name} for id, name in programs]
+        return Response(program_list)
 

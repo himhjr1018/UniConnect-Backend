@@ -25,3 +25,9 @@ class UniversityAddSerializer(serializers.ModelSerializer):
     class Meta:
         model = University
         fields = '__all__'
+
+
+class ProgramAddSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Program
+        fields = '__all__'
