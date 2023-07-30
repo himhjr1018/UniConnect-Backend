@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from universities.models import University
 from users.models import InterestedProgram, UserProfile
-from .models import Post
+from .models import Post, Comment
 from rest_framework import pagination, serializers
 from .pagination import CustomPostPagination
 
@@ -13,6 +13,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ['id', 'username']
 
+class CommentSerializer(serializers.ModelSerializer):
+    posted_by = ProfileSerializer()
+    class Meta:
+        model = Comment
+        fields = ["id", "content", 'posted_by', "ctime"]
 
 class PostSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
@@ -22,7 +27,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['content', 'ctime', 'likes_count', 'comments_count', 'posted_by', 'tags', 'is_liked']
+        fields = ['id', 'content', 'ctime', 'likes_count', 'comments_count', 'posted_by', 'tags', 'is_liked']
 
     def get_likes_count(self, post):
         return post.liked_by.count()
@@ -90,4 +95,10 @@ class AddPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['content', 'tags']
+
+
+class AddCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ["content", ]
 
