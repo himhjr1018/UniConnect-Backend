@@ -1,9 +1,10 @@
 from django.urls import path
 
-from .views import GetChanelId, GetMessagesList
+from .views import JoinChannel, GetMessagesList
 
 
 urlpatterns = [
-    path('get_channel_id/', GetChanelId.as_view(), name='get_channel_id'),
-    path('get_messages/<int:channel_id>/', GetMessagesList.as_view(), name="get_messages"),
+    path('join/<int:channel_id>/', JoinChannel.as_view(), name='join_channel'),
+    path('<int:channel_id>/messages/', GetMessagesList.as_view(), name='messages'),
+
 ]

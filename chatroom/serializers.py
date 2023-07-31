@@ -9,7 +9,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = "__all__"
+        exclude = ["channel"]
 
     def get_ctime(self, post):
         formatted_date = post.ctime.strftime('%d %B %Y')
