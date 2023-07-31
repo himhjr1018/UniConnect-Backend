@@ -11,7 +11,8 @@ from .pagination import CustomPostPagination
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['id', 'username']
+        fields = ['id', 'username', 'profile_picture']
+
 
 class CommentSerializer(serializers.ModelSerializer):
     posted_by = ProfileSerializer()
