@@ -30,7 +30,8 @@ urlpatterns = [
     path('universities/', include('universities.urls')),
     path('user/', include('users.urls')),
     path('ms_graph/', include('microsoft_graph.urls')),
-    path('community/', include('community.urls'))
+    path('community/', include('community.urls')),
+    path('chatroom/', include('chatroom.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 schema_view = get_schema_view(
