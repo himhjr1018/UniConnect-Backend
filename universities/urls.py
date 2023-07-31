@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import ProgramListAPIView, UniversityListAPIView, IntakeListAPIView, CountryListView, UniversityListView, \
-    UniversityCreateView, ProgramCreateView, ProgramListView
+    UniversityCreateView, ProgramCreateView, ProgramListView, UniversityDetailView
 
 
 urlpatterns = [
@@ -11,5 +11,7 @@ urlpatterns = [
     path('add/', UniversityCreateView.as_view(), name="add_university"),
     path('program/<int:university_id>/', ProgramCreateView.as_view(), name="add_prgrams"),
     path('programs/<int:university_id>/', ProgramListView.as_view(), name='program-list'),
-    path('', UniversityListView.as_view(), name="universities")
+    path('', UniversityListView.as_view(), name="universities"),
+    path('<int:university_id>/', UniversityDetailView.as_view(), name="university_detail")
+
 ]

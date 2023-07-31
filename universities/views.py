@@ -126,3 +126,15 @@ class ProgramListView(APIView):
         program_list = [{'value': id, 'label': name} for id, name in programs]
         return Response(program_list)
 
+
+class UniversityDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, university_id, format=None):
+        try:
+            university = University.objects.get(pk=university_id)
+        except University.DoesNotExist:
+            return Response({"error": "University not found."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = UniversityListSerializer(instance=university)
+        return Response(serializer.data)
+
