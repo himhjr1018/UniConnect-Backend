@@ -296,7 +296,7 @@ class OUserProfileDetailAPIView(generics.RetrieveAPIView):
             raise Http404("Profile Not Found")
 
     def get_serializer_context(self):
-        context = super(UserProfileDetailAPIView, self).get_serializer_context()
+        context = super().get_serializer_context()
         context['request'] = self.request
         return context
 
