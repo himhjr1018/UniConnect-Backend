@@ -1,4 +1,7 @@
 from rest_framework import serializers
+
+from chatroom.models import Channel
+from universities.serializers import UniversityListSerializer
 from users.models import UserProfile, Education, Experience, InterestedProgram, STAGE_CHOICES
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.validators import UniqueValidator
@@ -110,15 +113,24 @@ class InterestedProgramDSerializer(serializers.ModelSerializer):
         fields = ['id', 'intake', 'stage']
 
 
+class ChannelsDSerializer(serializers.ModelSerializer):
+    university = UniversityListSerializer()
+    class Meta:
+        model = Channel
+        fields = ['id','name','university','type']
+
+
+
 class UserProfileDetailSerializer(serializers.ModelSerializer):
     educations = serializers.SerializerMethodField()
     experiences = serializers.SerializerMethodField()
     interested_programs = serializers.SerializerMethodField()
+    channels = serializers.SerializerMethodField()
 
     class Meta:
         model = UserProfile
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'phone_number', 'city', 'state', 'country',
-                  'profile_picture', 'educations', 'experiences', 'interested_programs', 'con_connected']
+                  'profile_picture', 'educations', 'experiences', 'interested_programs', 'con_connected','channels']
 
     def get_educations(self, obj):
         educations = Education.objects.filter(profile=obj)
@@ -133,6 +145,11 @@ class UserProfileDetailSerializer(serializers.ModelSerializer):
     def get_interested_programs(self, obj):
         ips = InterestedProgram.objects.filter(profile=obj)
         serializer = InterestedProgramDSerializer(ips, many=True)
+        return serializer.data
+
+    def get_channels(self,obj):
+        channels = Channel.objects.filter(users__in=[obj])
+        serializer = ChannelsDSerializer(channels, many=True)
         return serializer.data
 
 

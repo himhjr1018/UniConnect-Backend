@@ -352,10 +352,10 @@ class UserProfileListAPIView(generics.ListAPIView):
 
 
 class InterestedProgramAPIView(APIView):
-    def get(self, request, format=None):
+    def get(self, request, user_id):
         user = request.user  # Assuming the user is authenticated and you are using sessions
 
-        interested_programs = InterestedProgram.objects.filter(profile__id=user.id)
+        interested_programs = InterestedProgram.objects.filter(profile__id=user_id)
         universities_data = []
 
         for interested_program in interested_programs:
