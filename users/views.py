@@ -313,7 +313,7 @@ def get_filter_by_contacts(queryset, profile):
     mobile_numbers = []
     for i in value:
         if i["mobilePhone"]:
-            mobile_numbers.append(i["mobilePhone"])
+            mobile_numbers.append(i["mobilePhone"].replace(" ", ""))
     return queryset.filter(phone_number__in=mobile_numbers)
 
 
