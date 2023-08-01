@@ -18,8 +18,15 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class ChannelSerializer(serializers.ModelSerializer):
-    users = ProfileSerializer(many=True)
+    users = serializers.MethodField()
+
     class Meta:
         model = Channel
         fields = ["id","name","type","users"]
+
+    def get_users(self, channel):
+        request = self.context.get("request")
+        users = channel.users.exclude(id=request.user.id)
+        p_serializer = ProfileSerializer(users, many=True)
+        return p_serializer.data
 

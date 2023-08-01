@@ -59,6 +59,6 @@ class GetMessagesList(APIView):
             serializer = MessageSerializer(messages, many=True)
             currentUser = UserProfile.objects.get(id=request.user.id)
             #From channel.users, I need to remove the currentUser object and send it. If its not possible, easily. Just ping me tomorrow and I should be able to handle in the front end
-            channelSerializer = ChannelSerializer(channel)
+            channelSerializer = ChannelSerializer(channel, context={'request': request})
             return Response({"id":channel.id,"is_joined":is_joined,"messages":serializer.data,"channel":channelSerializer.data})
 
