@@ -119,13 +119,25 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class ChannelsDSerializer(serializers.ModelSerializer):
     university = UniversityListSerializer()
-    users = ProfileSerializer(many=True)
+    users = serializers.SerializerMethodField()
 
     class Meta:
         model = Channel
         fields = ['id','name','university','type','users']
 
+    def get_users(self, channel):
+        request = self.context.get("request")
+        users = channel.users.exclude(id=request.user.id)
+        p_serializer = ProfileSerializer(users, many=True)
+        return p_serializer.data
 
+    def to_representation(self, instance):
+        data = super(ChannelsDSerializer, self).to_representation(instance)
+
+        if data.get('type', None) != 'university':
+            data.pop('university', None)
+
+        return data
 
 class UserProfileDetailSerializer(serializers.ModelSerializer):
     educations = serializers.SerializerMethodField()
@@ -155,7 +167,7 @@ class UserProfileDetailSerializer(serializers.ModelSerializer):
 
     def get_channels(self,obj):
         channels = Channel.objects.filter(users__in=[obj])
-        serializer = ChannelsDSerializer(channels, many=True)
+        serializer = ChannelsDSerializer(channels, many=True, context=self.context)
         return serializer.data
 
 

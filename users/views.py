@@ -278,6 +278,10 @@ class UserProfileDetailAPIView(generics.RetrieveAPIView):
     def get_object(self):
         return self.request.user.userprofile
 
+    def get_serializer_context(self):
+        context = super(UserProfileDetailAPIView, self).get_serializer_context()
+        context['request'] = self.request
+        return context
 
 class OUserProfileDetailAPIView(generics.RetrieveAPIView):
     queryset = UserProfile.objects.all()
@@ -290,6 +294,12 @@ class OUserProfileDetailAPIView(generics.RetrieveAPIView):
             return UserProfile.objects.get(id=profile_id)
         except UserProfile.DoesNotExist:
             raise Http404("Profile Not Found")
+
+    def get_serializer_context(self):
+        context = super(UserProfileDetailAPIView, self).get_serializer_context()
+        context['request'] = self.request
+        return context
+
 
 
 def get_filter_by_contacts(queryset, profile):
@@ -347,7 +357,7 @@ class UserProfileListAPIView(generics.ListAPIView):
             queryset = queryset.filter(interestedprogram__intake__in=intakes)
         queryset = queryset.exclude(id=profile.id).distinct()
         print(queryset.count())
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True, context={"request":request})
         return Response(serializer.data)
 
 
