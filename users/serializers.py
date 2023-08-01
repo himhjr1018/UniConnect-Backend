@@ -112,12 +112,18 @@ class InterestedProgramDSerializer(serializers.ModelSerializer):
         model = InterestedProgram
         fields = ['id', 'intake', 'stage']
 
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['id', 'username', 'profile_picture']
 
 class ChannelsDSerializer(serializers.ModelSerializer):
     university = UniversityListSerializer()
+    users = ProfileSerializer(many=True)
+
     class Meta:
         model = Channel
-        fields = ['id','name','university','type']
+        fields = ['id','name','university','type','users']
 
 
 

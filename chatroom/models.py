@@ -15,7 +15,7 @@ class Channel(models.Model):
     name = models.CharField(max_length=256)
     users = models.ManyToManyField(UserProfile,related_name="channels")
     type = models.CharField(max_length=256, choices=TYPE_CHOICES)
-    university = models.ForeignKey(University,null=True,on_delete=models.CASCADE)
+    university = models.ForeignKey(University,null=True,blank=True,on_delete=models.CASCADE)
 
 
 class Message(models.Model):

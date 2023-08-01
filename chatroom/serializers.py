@@ -18,7 +18,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class ChannelSerializer(serializers.ModelSerializer):
-    users = serializers.MethodField()
+    users = serializers.SerializerMethodField()
 
     class Meta:
         model = Channel
