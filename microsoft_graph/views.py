@@ -24,6 +24,7 @@ class GetGraphAuthUrl(APIView):
 class GraphRedirectUri(APIView):
     def post(self, request):
         graph_token_api = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+        print(request.data)
         post_data = {
             "client_id": config.clientId,
             "scope": config.graphUserScopes,
@@ -34,7 +35,8 @@ class GraphRedirectUri(APIView):
         }
         resp = requests.post(graph_token_api, data=post_data).json()
         print(resp)
-        profile = UserProfile.objects.get(id=int(request.data["state"][0]))
+        print(request.data["state"][0])
+        profile = UserProfile.objects.get(id=int(request.data["state"]))
         profile.con_access_token = resp["access_token"]
         profile.con_refresh_token = resp["refresh_token"]
         profile.con_connected = True
