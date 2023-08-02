@@ -44,6 +44,6 @@ class GraphRedirectUri(APIView):
         profile.con_access_expiry = datetime.now() + timedelta(minutes=50)
         profile.save()
 
-        redirect_url = "http://127.0.0.1:3000/home"
+        redirect_url = "http://127.0.0.1:3000/"
         return HttpResponseRedirect(redirect_url)
 
