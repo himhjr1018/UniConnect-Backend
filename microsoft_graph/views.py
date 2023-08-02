@@ -6,6 +6,7 @@ import requests
 from datetime import datetime, timedelta
 from microsoft_graph import config
 from users.models import UserProfile
+from django.http import HttpResponseRedirect
 
 
 # Create your views here.
@@ -42,6 +43,7 @@ class GraphRedirectUri(APIView):
         profile.con_connected = True
         profile.con_access_expiry = datetime.now() + timedelta(minutes=50)
         profile.save()
-        return Response(status=status.HTTP_200_OK)
 
+        redirect_url = "http://127.0.0.1:3000/home"
+        return HttpResponseRedirect(redirect_url)
 
