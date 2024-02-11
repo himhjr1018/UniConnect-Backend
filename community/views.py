@@ -98,7 +98,7 @@ class CommentAPIView(APIView):
             comment.posted_by = profile
             comment.post = post
             comment.save()
-            serializer  =CommentSerializer(instance=comment)
+            serializer = CommentSerializer(instance=comment)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -123,7 +123,7 @@ class CommentView(APIView):
 class PostView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def delete(self, request, post_id):
+    def delete (self, request, post_id):
         try:
             post = Post.objects.get(id=post_id)
         except Post.DoesNotExist:
